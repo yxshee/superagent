@@ -891,7 +891,7 @@ Request.prototype.cert = function (cert) {
 
 /**
  * Do not reject expired or invalid TLS certs.
- * sets `rejectUnauthorized=true`. Be warned that this allows MITM attacks.
+ * sets `rejectUnauthorized=false`. Be warned that this allows MITM attacks.
  *
  * @return {Request} for chaining
  * @api public

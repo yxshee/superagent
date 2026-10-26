@@ -314,7 +314,7 @@ This method has two optional arguments: number of retries (default 1) and a call
        .get('https://example.com/search')
        .retry(2) // or:
        .retry(2, callback)
-       .then(finished);
+       .then(finished)
        .catch(failed);
 ```
 
@@ -407,7 +407,7 @@ In Node.js SuperAgent supports methods to configure HTTPS requests:
 * `.cert()`: Set the client certificate chain(s)
 * `.key()`: Set the client private key(s)
 * `.pfx()`: Set the client PFX or PKCS12 encoded private key and certificate chain
-* `.disableTLSCerts()`: Does not reject expired or invalid TLS certs. Sets internally `rejectUnauthorized=true`. *Be warned, this method allows MITM attacks.*
+* `.disableTLSCerts()`: Does not reject expired or invalid TLS certs. Sets internally `rejectUnauthorized=false`. *Be warned, this method allows MITM attacks.*
 
 For more information, see Node.js [https.request docs](https://nodejs.org/api/https.html#https_https_request_options_callback).
 
@@ -536,11 +536,13 @@ The response status flags help determine if the request was a success, among oth
      // basics
      res.info = 1 == type;
      res.ok = 2 == type;
+     res.redirect = 3 == type;
      res.clientError = 4 == type;
      res.serverError = 5 == type;
      res.error = 4 == type || 5 == type;
 
      // sugar
+     res.created = 201 == status;
      res.accepted = 202 == status;
      res.noContent = 204 == status || 1223 == status;
      res.badRequest = 400 == status;
@@ -548,6 +550,7 @@ The response status flags help determine if the request was a success, among oth
      res.notAcceptable = 406 == status;
      res.notFound = 404 == status;
      res.forbidden = 403 == status;
+     res.unprocessableEntity = 422 == status;
 ```
 
 
@@ -615,11 +618,13 @@ The `auth` method also supports a `type` of `bearer`, to specify token-based aut
 
 ## Following redirects
 
-By default up to 5 redirects will be followed, however you may specify this with the `res.redirects(n)` method:
+By default up to 5 redirects will be followed, however you may specify this with the `req.redirects(n)` method:
 
 ```javascript
     const response = await request.get('/some.png').redirects(2);
 ```
+
+In Node, `HEAD` requests do not follow redirects by default. Call `.redirects(n)` on them if you want redirects followed.
 
 Redirects exceeding the limit are treated as errors. Use `.ok(res => res.status < 400)` to read them as successful responses.
 
@@ -673,7 +678,7 @@ Regular request methods called on the agent will be used as defaults for all req
     await agent.get('/also-with-plugin-and-auth');
 ```
 
-The complete list of methods that the agent can use to set defaults is: `use`, `on`, `once`, `set`, `query`, `type`, `accept`, `auth`, `withCredentials`, `sortQuery`, `retry`, `ok`, `redirects`, `timeout`, `buffer`, `serialize`, `parse`, `ca`, `key`, `pfx`, `cert`.
+The complete list of methods that the agent can use to set defaults is: `use`, `on`, `once`, `set`, `query`, `type`, `accept`, `auth`, `withCredentials`, `sortQuery`, `retry`, `ok`, `redirects`, `timeout`, `buffer`, `serialize`, `parse`, `ca`, `key`, `pfx`, `cert`, `disableTLSCerts`.
 
 
 ## Piping data
